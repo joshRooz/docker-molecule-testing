@@ -1,0 +1,9 @@
+FROM archlinux:latest
+
+RUN useradd ansible --create-home --shell /bin/bash --comment "Ansible Configuration User" && \
+  pacman -Syu --noconfirm python3 sudo && python --version
+
+ADD ansible.sudoers /etc/sudoers.d/ansible
+ADD --chown=ansible:ansible provisioning-key.pub /home/ansible/.ssh/authorized_keys
+
+CMD ["/usr/bin/bash"]
