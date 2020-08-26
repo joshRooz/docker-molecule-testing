@@ -1,9 +1,22 @@
 FROM archlinux:latest
 
-RUN useradd ansible --create-home --shell /bin/bash --comment "Ansible Configuration User" && \
-  pacman -Syu --noconfirm python3 sudo && python --version
+ENV pip_packages "ansible"
 
-ADD ansible.sudoers /etc/sudoers.d/ansible
-ADD --chown=ansible:ansible provisioning-key.pub /home/ansible/.ssh/authorized_keys
+# Install packages
+RUN pacman -Syu --noconfirm \
+  && pacman -S --noconfirm \
+  sudo \
+  which \
+  python \
+  python-pip \
+  && pacman -Sc --noconfirm
 
-CMD ["/usr/bin/bash"]
+# Install Ansible
+RUN pip install $pip_packages
+
+# Install Ansible inventory file
+RUN mkdir -p /etc/ansible \
+  && echo -e '[local]\nlocalhost ansible_connection=local' > /etc/ansible/hosts
+
+VOLUME ["/sys/fs/cgroup"]
+CMD ["/usr/lib/systemd/systemd", "--system"]
