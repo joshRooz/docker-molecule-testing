@@ -1,5 +1,6 @@
 FROM archlinux:latest
 
+ENV container docker
 ENV pip_packages "ansible"
 
 # Install packages
